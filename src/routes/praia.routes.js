@@ -13,9 +13,15 @@ router.get("/praias", async (req, res) => {
   }
 });
 
-router.get("/praias/:id", (req, res) => {
+router.get("/praias/:id", async (req, res) => {
   const { id } = req.params;
-  res.send(`Detalhes da Praia com ID: ${id}`);
+  try {
+    const [rows] = await pool.query(`SELECT * FROM praia WHERE id = ${id}`);
+    res.json(rows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Erro ao buscar praias" });
+  }
 });
 
 export default router;

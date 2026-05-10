@@ -1,241 +1,303 @@
+import { jest } from '@jest/globals'
 import request from 'supertest'
-import app from '../src/app.js'
 
-describe('API Guia de Praias 🌊', () => {
+const praiaServiceMock = {
+    getAll: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn()
+}
 
-    let usuarioId
-    let praiaId
-    let avaliacaoId
+const usuarioServiceMock = {
+    getAll: jest.fn(),
+    getById: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn()
+}
 
-    // =========================
-    // USUARIOS
-    // =========================
+const favoritoServiceMock = {
+    create: jest.fn(),
+    getByUsuario: jest.fn(),
+    remove: jest.fn()
+}
 
-    describe('Usuários', () => {
+const avaliacaoServiceMock = {
+    create: jest.fn(),
+    getByPraia: jest.fn(),
+    getByUsuario: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn()
+}
 
-        test('POST /usuarios', async () => {
+await jest.unstable_mockModule('../src/service/praiaService.js', () => ({
+    default: praiaServiceMock
+}))
 
-            const response = await request(app)
-                .post('/usuarios')
-                .send({
-                    nome: 'Shiro',
-                    email: `shiro${Date.now()}@test.com`,
-                    senha: '123456'
-                })
+await jest.unstable_mockModule('../src/service/usuarioService.js', () => ({
+    default: usuarioServiceMock
+}))
 
-            expect(response.statusCode).toBe(201)
+await jest.unstable_mockModule('../src/service/favoritoService.js', () => ({
+    default: favoritoServiceMock
+}))
 
-            usuarioId = response.body.id
+await jest.unstable_mockModule('../src/service/avaliacaoService.js', () => ({
+    default: avaliacaoServiceMock
+}))
 
-            expect(response.body).toHaveProperty('id')
-        })
+const { default: app } = await import('../src/app.js')
 
-        test('GET /usuarios', async () => {
-
-            const response = await request(app)
-                .get('/usuarios')
-
-            expect(response.statusCode).toBe(200)
-            expect(Array.isArray(response.body)).toBe(true)
-        })
-
-        test('GET /usuarios/:id', async () => {
-
-            const response = await request(app)
-                .get(`/usuarios/${usuarioId}`)
-
-            expect(response.statusCode).toBe(200)
-            expect(response.body).toHaveProperty('id')
-        })
-
-        test('PUT /usuarios/:id', async () => {
-
-            const response = await request(app)
-                .put(`/usuarios/${usuarioId}`)
-                .send({
-                    nome: 'Shiro Updated',
-                    email: `updated${Date.now()}@test.com`,
-                    senha: '654321'
-                })
-
-            expect(response.statusCode).toBe(200)
-        })
+describe('Rotas da API Guia de Praias', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
     })
 
-    // =========================
-    // PRAIAS
-    // =========================
-
     describe('Praias', () => {
-
-        test('POST /praias', async () => {
-
-            const response = await request(app)
-                .post('/praias')
-                .send({
-                    nome: 'Praia Teste',
-                    regiao: 'Sul',
-                    descricao: 'Praia para teste',
-                    nivel_perigo: 'Verde',
-                    surf: true
-                })
-
-            expect(response.statusCode).toBe(201)
-
-            praiaId = response.body.id
-        })
-
         test('GET /praias', async () => {
+            praiaServiceMock.getAll.mockResolvedValue([{ id: 1, nome: 'Praia A' }])
 
-            const response = await request(app)
-                .get('/praias')
+            const response = await request(app).get('/praias')
 
             expect(response.statusCode).toBe(200)
-            expect(Array.isArray(response.body)).toBe(true)
+            expect(response.body).toEqual([{ id: 1, nome: 'Praia A' }])
+            expect(praiaServiceMock.getAll).toHaveBeenCalledTimes(1)
         })
 
         test('GET /praias/:id', async () => {
+            praiaServiceMock.getById.mockResolvedValue({ id: 10, nome: 'Praia B' })
 
-            const response = await request(app)
-                .get(`/praias/${praiaId}`)
+            const response = await request(app).get('/praias/10')
 
             expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ id: 10, nome: 'Praia B' })
+            expect(praiaServiceMock.getById).toHaveBeenCalledWith('10')
+        })
+
+        test('POST /praias', async () => {
+            const payload = {
+                nome: 'Praia Nova',
+                regiao: 'Sul',
+                descricao: 'Teste',
+                nivel_perigo: 'Verde',
+                surf: true
+            }
+
+            praiaServiceMock.create.mockResolvedValue({ id: 2, ...payload })
+
+            const response = await request(app).post('/praias').send(payload)
+
+            expect(response.statusCode).toBe(201)
+            expect(response.body).toEqual({ id: 2, ...payload })
+            expect(praiaServiceMock.create).toHaveBeenCalledWith(
+                payload.nome,
+                payload.regiao,
+                payload.descricao,
+                payload.nivel_perigo,
+                payload.surf
+            )
         })
 
         test('PUT /praias/:id', async () => {
+            const payload = {
+                nome: 'Praia Atualizada',
+                regiao: 'Norte',
+                descricao: 'Atualizada',
+                nivel_perigo: 'Amarela',
+                surf: false
+            }
 
-            const response = await request(app)
-                .put(`/praias/${praiaId}`)
-                .send({
-                    nome: 'Praia Atualizada',
-                    regiao: 'Norte',
-                    descricao: 'Descrição nova',
-                    nivel_perigo: 'Amarela',
-                    surf: false
-                })
+            praiaServiceMock.update.mockResolvedValue({ id: 2, ...payload })
 
-            expect(response.statusCode).toBe(200)
-        })
-    })
-
-    // =========================
-    // AVALIAÇÕES
-    // =========================
-
-    describe('Avaliações', () => {
-
-        test('POST /avaliacoes', async () => {
-
-            const response = await request(app)
-                .post('/avaliacoes')
-                .send({
-                    nota: 5,
-                    comentario: 'Praia incrível',
-                    usuario_id: usuarioId,
-                    praia_id: praiaId
-                })
-
-            expect(response.statusCode).toBe(201)
-
-            avaliacaoId = response.body.id
-        })
-
-        test('GET /avaliacoes/praia/:id', async () => {
-
-            const response = await request(app)
-                .get(`/avaliacoes/praia/${praiaId}`)
+            const response = await request(app).put('/praias/2').send(payload)
 
             expect(response.statusCode).toBe(200)
-        })
-
-        test('GET /avaliacoes/usuario/:id', async () => {
-
-            const response = await request(app)
-                .get(`/avaliacoes/usuario/${usuarioId}`)
-
-            expect(response.statusCode).toBe(200)
-        })
-
-        test('PUT /avaliacoes/:id', async () => {
-
-            const response = await request(app)
-                .put(`/avaliacoes/${avaliacaoId}`)
-                .send({
-                    nota: 4,
-                    comentario: 'Muito boa'
-                })
-
-            expect(response.statusCode).toBe(200)
-        })
-    })
-
-    // =========================
-    // FAVORITOS
-    // =========================
-
-    describe('Favoritos', () => {
-
-        test('POST /favoritos', async () => {
-
-            const response = await request(app)
-                .post('/favoritos')
-                .send({
-                    usuario_id: usuarioId,
-                    praia_id: praiaId
-                })
-
-            expect(response.statusCode).toBe(201)
-        })
-
-        test('GET /favoritos/usuario/:id', async () => {
-
-            const response = await request(app)
-                .get(`/favoritos/usuario/${usuarioId}`)
-
-            expect(response.statusCode).toBe(200)
-        })
-
-        test('DELETE /favoritos', async () => {
-
-            const response = await request(app)
-                .delete('/favoritos')
-                .send({
-                    usuario_id: usuarioId,
-                    praia_id: praiaId
-                })
-
-            expect(response.statusCode).toBe(200)
-        })
-    })
-
-    // =========================
-    // DELETE FINAL
-    // =========================
-
-    describe('Deletes finais', () => {
-
-        test('DELETE /avaliacoes/:id', async () => {
-
-            const response = await request(app)
-                .delete(`/avaliacoes/${avaliacaoId}`)
-
-            expect(response.statusCode).toBe(200)
-        })
-
-        test('DELETE /usuarios/:id', async () => {
-
-            const response = await request(app)
-                .delete(`/usuarios/${usuarioId}`)
-
-            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ id: 2, ...payload })
+            expect(praiaServiceMock.update).toHaveBeenCalledWith(
+                '2',
+                payload.nome,
+                payload.regiao,
+                payload.descricao,
+                payload.nivel_perigo,
+                payload.surf
+            )
         })
 
         test('DELETE /praias/:id', async () => {
+            praiaServiceMock.remove.mockResolvedValue()
 
-            const response = await request(app)
-                .delete(`/praias/${praiaId}`)
+            const response = await request(app).delete('/praias/2')
 
             expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ mensagem: 'Praia deletada com sucesso' })
+            expect(praiaServiceMock.remove).toHaveBeenCalledWith('2')
+        })
+    })
+
+    describe('Usuarios', () => {
+        test('GET /usuarios', async () => {
+            usuarioServiceMock.getAll.mockResolvedValue([{ id: 1, nome: 'Isaac' }])
+
+            const response = await request(app).get('/usuarios')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual([{ id: 1, nome: 'Isaac' }])
+            expect(usuarioServiceMock.getAll).toHaveBeenCalledTimes(1)
+        })
+
+        test('GET /usuarios/:id', async () => {
+            usuarioServiceMock.getById.mockResolvedValue({ id: 1, nome: 'Isaac' })
+
+            const response = await request(app).get('/usuarios/1')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ id: 1, nome: 'Isaac' })
+            expect(usuarioServiceMock.getById).toHaveBeenCalledWith('1')
+        })
+
+        test('POST /usuarios', async () => {
+            const payload = { nome: 'Isaac', email: 'isaac@test.com', senha: '123456' }
+            usuarioServiceMock.create.mockResolvedValue({ id: 1, ...payload })
+
+            const response = await request(app).post('/usuarios').send(payload)
+
+            expect(response.statusCode).toBe(201)
+            expect(response.body).toEqual({ id: 1, ...payload })
+            expect(usuarioServiceMock.create).toHaveBeenCalledWith(
+                payload.nome,
+                payload.email,
+                payload.senha
+            )
+        })
+
+        test('PUT /usuarios/:id', async () => {
+            const payload = { nome: 'Isaac 2', email: 'isaac2@test.com', senha: '654321' }
+            usuarioServiceMock.update.mockResolvedValue({ id: 1, ...payload })
+
+            const response = await request(app).put('/usuarios/1').send(payload)
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ id: 1, ...payload })
+            expect(usuarioServiceMock.update).toHaveBeenCalledWith(
+                '1',
+                payload.nome,
+                payload.email,
+                payload.senha
+            )
+        })
+
+        test('DELETE /usuarios/:id', async () => {
+            usuarioServiceMock.remove.mockResolvedValue()
+
+            const response = await request(app).delete('/usuarios/1')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ mensagem: 'Usuário deletado com sucesso' })
+            expect(usuarioServiceMock.remove).toHaveBeenCalledWith('1')
+        })
+    })
+
+    describe('Favoritos', () => {
+        test('POST /favoritos', async () => {
+            const payload = { usuario_id: 1, praia_id: 2 }
+            favoritoServiceMock.create.mockResolvedValue({ id: 99, ...payload })
+
+            const response = await request(app).post('/favoritos').send(payload)
+
+            expect(response.statusCode).toBe(201)
+            expect(response.body).toEqual({ id: 99, ...payload })
+            expect(favoritoServiceMock.create).toHaveBeenCalledWith(
+                payload.usuario_id,
+                payload.praia_id
+            )
+        })
+
+        test('GET /favoritos/usuario/:id', async () => {
+            favoritoServiceMock.getByUsuario.mockResolvedValue([{ id: 1, praia_id: 2 }])
+
+            const response = await request(app).get('/favoritos/usuario/1')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual([{ id: 1, praia_id: 2 }])
+            expect(favoritoServiceMock.getByUsuario).toHaveBeenCalledWith('1')
+        })
+
+        test('DELETE /favoritos', async () => {
+            const payload = { usuario_id: 1, praia_id: 2 }
+            favoritoServiceMock.remove.mockResolvedValue()
+
+            const response = await request(app).delete('/favoritos').send(payload)
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ mensagem: 'Favorito removido' })
+            expect(favoritoServiceMock.remove).toHaveBeenCalledWith(
+                payload.usuario_id,
+                payload.praia_id
+            )
+        })
+    })
+
+    describe('Avaliacoes', () => {
+        test('POST /avaliacoes', async () => {
+            const payload = { nota: 5, comentario: 'Top', usuario_id: 1, praia_id: 2 }
+            avaliacaoServiceMock.create.mockResolvedValue({ id: 7, ...payload })
+
+            const response = await request(app).post('/avaliacoes').send(payload)
+
+            expect(response.statusCode).toBe(201)
+            expect(response.body).toEqual({ id: 7, ...payload })
+            expect(avaliacaoServiceMock.create).toHaveBeenCalledWith(
+                payload.nota,
+                payload.comentario,
+                payload.usuario_id,
+                payload.praia_id
+            )
+        })
+
+        test('GET /avaliacoes/praia/:id', async () => {
+            avaliacaoServiceMock.getByPraia.mockResolvedValue([{ id: 10, nota: 4 }])
+
+            const response = await request(app).get('/avaliacoes/praia/2')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual([{ id: 10, nota: 4 }])
+            expect(avaliacaoServiceMock.getByPraia).toHaveBeenCalledWith('2')
+        })
+
+        test('GET /avaliacoes/usuario/:id', async () => {
+            avaliacaoServiceMock.getByUsuario.mockResolvedValue([{ id: 10, nota: 4 }])
+
+            const response = await request(app).get('/avaliacoes/usuario/1')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual([{ id: 10, nota: 4 }])
+            expect(avaliacaoServiceMock.getByUsuario).toHaveBeenCalledWith('1')
+        })
+
+        test('PUT /avaliacoes/:id', async () => {
+            const payload = { nota: 3, comentario: 'Boa' }
+            avaliacaoServiceMock.update.mockResolvedValue({ id: 7, ...payload })
+
+            const response = await request(app).put('/avaliacoes/7').send(payload)
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ id: 7, ...payload })
+            expect(avaliacaoServiceMock.update).toHaveBeenCalledWith(
+                '7',
+                payload.nota,
+                payload.comentario
+            )
+        })
+
+        test('DELETE /avaliacoes/:id', async () => {
+            avaliacaoServiceMock.remove.mockResolvedValue()
+
+            const response = await request(app).delete('/avaliacoes/7')
+
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual({ mensagem: 'Avaliação removida' })
+            expect(avaliacaoServiceMock.remove).toHaveBeenCalledWith('7')
         })
     })
 })

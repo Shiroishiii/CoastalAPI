@@ -12,6 +12,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/Landing';
+import Register from './pages/Register';
+
 
 
 const router = createBrowserRouter([
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <Dashboard />
+  },
+  {
+    path: "/login",
+    element: <Login />
+  },
+  {
+    path: "cadastro",
+    element: <Register />
   }
 ]);
 

@@ -13,7 +13,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/Landing';
 import Register from './pages/Register';
-
+import PraiasPage from './pages/PraiasPage';
+import DetalhePraiaPage from './pages/DetalhePraia';
 
 
 const router = createBrowserRouter([
@@ -32,6 +33,14 @@ const router = createBrowserRouter([
   {
     path: "cadastro",
     element: <Register />
+  },
+  {
+    path: "/praias",
+    element: <PraiasPage />
+  },
+  {
+    path: "/praias/:id",
+    element: <DetalhePraiaPage />
   }
 ]);
 

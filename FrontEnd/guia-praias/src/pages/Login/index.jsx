@@ -1,18 +1,35 @@
 import { useState } from "react";
+import axios from "axios"
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
-
-    function handleLogin(e) {
+    async function handleLogin(e) {
         e.preventDefault();
 
-        console.log({
-            email,
-            senha
-        });
+        try {
+            const { data } = await axios.post(
+                "http://localhost:3000/login",
+                {
+                    email,
+                    senha
+                }
+            );
+
+            console.log(data);
+            // Exemplo:
+            // localStorage.setItem("token", data.token);
+            // navigate("/dashboard");
+
+        } catch (error) {
+            console.error(error);
+
+            if (error.response) {
+                console.log(error.response.data);
+            }
+        }
     }
 
     return (

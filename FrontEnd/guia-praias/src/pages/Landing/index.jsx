@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import praiaImg from "../../assets/praia.jpg";
 import praiaImg1 from "../../assets/praia1.jpg";
 import praiaImg2 from "../../assets/praia2.jpg";
@@ -26,9 +27,12 @@ function LandingPage() {
                         CoastalAPI
                     </h1>
 
-                    <button className="mt-8 bg-orange-500 hover:bg-orange-600 transition px-10 py-4 rounded-full text-xl font-semibold shadow-lg">
+                    <Link
+                        to="/praias"
+                        className="inline-block mt-8 bg-orange-500 hover:bg-orange-600 transition px-10 py-4 rounded-full text-xl font-semibold shadow-lg"
+                    >
                         Ver detalhes
-                    </button>
+                    </Link>
                 </div>
             </section>
 

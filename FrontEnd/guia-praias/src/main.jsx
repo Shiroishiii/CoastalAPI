@@ -2,25 +2,31 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
-//react router
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 
-//toastify
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
+
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import LandingPage from './pages/Landing';
 import Register from './pages/Register';
 import PraiasPage from './pages/PraiasPage';
 import DetalhePraiaPage from './pages/DetalhePraia';
-
+import Configuracoes from './pages/Configuracoes';
+import Favoritos from './pages/Favoritos';
+import Sobre from './pages/Sobre';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingPage />
+  },
+  {
+    path: "/home",
+    element: <Home />
   },
   {
     path: "/dashboard",
@@ -31,7 +37,7 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: "cadastro",
+    path: "/cadastro",
     element: <Register />
   },
   {
@@ -41,6 +47,18 @@ const router = createBrowserRouter([
   {
     path: "/praias/:id",
     element: <DetalhePraiaPage />
+  },
+  {
+    path: "/configuracoes",
+    element: <Configuracoes />
+  },
+  {
+    path: "/favoritos",
+    element: <Favoritos />
+  },
+  {
+    path: "/sobre",
+    element: <Sobre />
   }
 ]);
 

@@ -1,34 +1,34 @@
 import { useState } from "react";
-import axios from "axios"
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { setUsuario } from "../../utils/auth";
 
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
+    const navigate = useNavigate();
+
     async function handleLogin(e) {
         e.preventDefault();
 
         try {
-            const { data } = await axios.post(
-                "http://localhost:3000/login",
-                {
-                    email,
-                    senha
-                }
-            );
+            const response = await fetch("http://localhost:3000/usuarios");
+            const usuarios = await response.json();
+            const usuario = usuarios.find((u) => u.email === email);
 
-            console.log(data);
-            // Exemplo:
-            // localStorage.setItem("token", data.token);
-            // navigate("/dashboard");
+            if (!usuario) {
+                toast.error("Usuário não encontrado.");
+                return;
+            }
 
+            setUsuario(usuario);
+            toast.success("Login realizado com sucesso!");
+            navigate("/home");
         } catch (error) {
             console.error(error);
-
-            if (error.response) {
-                console.log(error.response.data);
-            }
+            toast.error("Erro ao fazer login.");
         }
     }
 
@@ -86,9 +86,12 @@ function LoginPage() {
 
                     <p className="text-center mt-6 text-gray-400">
                         Não possui conta?
-                        <span className="text-orange-500 hover:underline cursor-pointer ml-1">
+                        <Link
+                            to="/cadastro"
+                            className="text-orange-500 hover:underline ml-1"
+                        >
                             Cadastre-se
-                        </span>
+                        </Link>
                     </p>
                 </form>
             </main>

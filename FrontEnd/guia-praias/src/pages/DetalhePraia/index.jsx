@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { fetchApi } from "../../utils/api";
 
 function DetalhePraiaPage() {
     const { id } = useParams();
@@ -9,9 +10,8 @@ function DetalhePraiaPage() {
     const [praia, setPraia] = useState(null);
 
     useEffect(() => {
-        fetch(`http://localhost:3000/praias/${id}`)
-            .then(res => res.json())
-            .then(data => setPraia(data))
+        fetchApi(`/praias/${id}`)
+            .then((data) => setPraia(data))
             .catch(console.error);
     }, [id]);
 
@@ -28,11 +28,15 @@ function DetalhePraiaPage() {
             <Header />
 
             <section className="h-[60vh] relative">
-                <img
-                    src={praia.imagem}
-                    alt={praia.nome}
-                    className="w-full h-full object-cover"
-                />
+                {praia.imagem ? (
+                    <img
+                        src={praia.imagem}
+                        alt={praia.nome}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#0b3d5c] to-[#020b18]" />
+                )}
 
                 <div className="absolute inset-0 bg-black/50" />
 
@@ -69,18 +73,18 @@ function DetalhePraiaPage() {
 
                     <div className="bg-[#0b1525] rounded-3xl p-6">
                         <h3 className="font-bold text-orange-500">
-                            Tipo do Mar
+                            Nível de perigo
                         </h3>
 
-                        <p>{praia.tipoMar}</p>
+                        <p>{praia.nivel_perigo}</p>
                     </div>
 
                     <div className="bg-[#0b1525] rounded-3xl p-6">
                         <h3 className="font-bold text-orange-500">
-                            Estrutura
+                            Surf
                         </h3>
 
-                        <p>{praia.estrutura}</p>
+                        <p>{praia.surf ? "Sim" : "Não"}</p>
                     </div>
                 </div>
             </main>

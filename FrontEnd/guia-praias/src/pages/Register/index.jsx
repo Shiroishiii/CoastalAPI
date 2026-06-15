@@ -1,11 +1,15 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { setUsuario } from "../../utils/auth";
 
 function Register() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
+    const navigate = useNavigate();
 
     async function handleRegister(e) {
         e.preventDefault();
@@ -32,15 +36,13 @@ function Register() {
                 throw new Error(data.message);
             }
 
-            alert("Usuário cadastrado com sucesso!");
-
-            setNome("");
-            setEmail("");
-            setSenha("");
+            setUsuario(data);
+            toast.success("Usuário cadastrado com sucesso!");
+            navigate("/home");
 
         } catch (error) {
             console.error(error);
-            alert("Erro ao cadastrar usuário.");
+            toast.error("Erro ao cadastrar usuário.");
         }
     }
 
@@ -112,9 +114,12 @@ function Register() {
 
                     <p className="text-center mt-6 text-gray-400">
                         Já possui conta?
-                        <span className="text-orange-500 hover:underline cursor-pointer ml-1">
+                        <Link
+                            to="/login"
+                            className="text-orange-500 hover:underline ml-1"
+                        >
                             Entrar
-                        </span>
+                        </Link>
                     </p>
                 </form>
             </main>

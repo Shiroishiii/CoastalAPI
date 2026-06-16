@@ -24,6 +24,10 @@ function LoginPage() {
             }
 
             setUsuario(usuario);
+            localStorage.setItem(
+                "usuarioId",
+                usuario.id
+            );
             toast.success("Login realizado com sucesso!");
             navigate("/home");
         } catch (error) {

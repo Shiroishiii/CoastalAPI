@@ -49,6 +49,43 @@ function PraiasPage() {
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-orange-500 transition"
                 />
             </div>
+            <div className="max-w-6xl mx-auto px-6 mb-10">
+                <div className="bg-[#0b1525] rounded-2xl p-5 border border-white/5">
+                    <h2 className="text-lg font-semibold mb-4">
+                        Legenda de Segurança
+                    </h2>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span className="text-sm text-gray-300">
+                                <strong className="text-green-400">Verde</strong> — Seguro
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <span className="text-sm text-gray-300">
+                                <strong className="text-yellow-400">Amarela</strong> — Atenção
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <span className="text-sm text-gray-300">
+                                <strong className="text-red-400">Vermelha</strong> — Perigo
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                            <span className="text-sm text-gray-300">
+                                <strong className="text-purple-400">Roxa</strong> — Extremo
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <section className="max-w-6xl mx-auto px-6 pb-20">
                 {carregando && (

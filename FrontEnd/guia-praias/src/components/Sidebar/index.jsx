@@ -16,6 +16,7 @@ export default function Sidebar() {
     function handleLogout() {
         logout();
         navigate("/login");
+        localStorage.clear()
     }
 
     return (

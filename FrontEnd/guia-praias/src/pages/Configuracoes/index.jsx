@@ -92,8 +92,10 @@ function Configuracoes() {
                 className="w-full max-w-lg bg-[#0b1525] p-8 rounded-3xl shadow-xl border border-[#1c2a40]"
             >
                 <div className="mb-5">
-                    <label className="block mb-2 font-medium">Nome</label>
+                    <label htmlFor="nome" className="block mb-2 font-medium">Nome</label>
                     <input
+                        id="nome"
+                        name="nome"
                         type="text"
                         placeholder="Digite seu nome"
                         value={nome}
@@ -103,8 +105,10 @@ function Configuracoes() {
                 </div>
 
                 <div className="mb-5">
-                    <label className="block mb-2 font-medium">Email</label>
+                    <label htmlFor="email" className="block mb-2 font-medium">Email</label>
                     <input
+                        id="email"
+                        name="email"
                         type="email"
                         placeholder="Digite seu email"
                         value={email}
@@ -114,8 +118,10 @@ function Configuracoes() {
                 </div>
 
                 <div className="mb-8">
-                    <label className="block mb-2 font-medium">Senha</label>
+                    <label htmlFor="password" className="block mb-2 font-medium">Senha</label>
                     <input
+                        id="senha"
+                        name="senha"
                         type="password"
                         placeholder="Digite sua senha"
                         value={senha}
